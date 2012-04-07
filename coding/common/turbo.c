@@ -1,3 +1,4 @@
+#include "coding.h"
 
 /* ========================================================================= */
 /*              LOCAL VARIABLES DEFINITION                                   */
@@ -95,8 +96,21 @@ static void turbo_encode_p(char *in1, char *in2, int len, char *out)
 	*d2++ = out2_t[2];
 }
 
-void turbo_encode(char *in, int len, int index, char *out)
+void turbo_encode(char *in, codeblock_param *param, int cbindex, char *out)
 {
-	turbo_interleave(in, len, index, bit_buffer);
-	turbo_encode_p(in, bit_buffer, len, out);
+	int K;
+	
+	K = (cbindex<param->C_minus)?(param->K_minus):(param->K_plus);
+	turbo_interleave(in, K, param->index, bit_buffer);
+	turbo_encode_p(in, bit_buffer, K, out);
+	
+	/* If the code block to be encoded is the 0-th code block and 
+	 * the number of filler bits is greater than zero, i.e., F > 0, 
+	 * then the encoder shall set ck, = 0, k = 0,…,(F-1) at its input 
+	 * and shall set dk(0)=<NULL>, k = 0,…,(F-1) and dk(1)=<NULL>, k = 0,…,(F-1) at its output.
+	 */
+	if ( (cbindex == 0) && (param->F > 0) ) {
+		memset(out, 0xFF, param->F * sizeof(char));
+		memset(out+K+4, 0xFF, param->F * sizeof(char));
+	}
 }

@@ -24,6 +24,32 @@ int test_conv()
 	return 0;
 }
 
+int test_turbo()
+{
+	char input_byte[5] = {0xAC, 0xBC, 0xD2, 0x48, 0x00};
+	char output_byte[18] = {0x0};
+	char output_ref[18]  = {0x95, 0xD3, 0x69, 0x18, 0xC6, 0xE8, 0xE6, 0x88, 0xD9, 0xB4, 0xB1, 0xE8};
+	char input_bit[40];
+	char output_bit[132];
+	int  i;
+	
+	codeblock_param param;
+	calc_codeblock_param(32, &param);
+	
+	unpack(input_byte, 4, input_bit);
+	turbo_encode(input_bit, &param, 0, output_bit);
+	pack(output_bit, 136, output_byte);
+	
+	for (i=0; i<12; i++) {
+		//printf("%x - %x\n", output_byte[i], output_ref[i]);
+		//if (output_byte[i] != output_ref[i]) {
+		//	return -1;
+		//}
+	}
+	
+	return 0;
+}
+
 void main()
 {
 	int result;
@@ -34,5 +60,6 @@ void main()
 	else
 		printf("test_conv FAILED!\n");
 	
-	// test_turbo
+	result = test_turbo();
+	printf("test_turbo UNKOWN!\n");
 }
