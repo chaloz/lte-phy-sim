@@ -1,33 +1,35 @@
 
-void conv_encode(char *in, int len, char *out)
+int conv_encode(char *in, int K, char *out)
 {
-	char D = 0;
+	char reg = 0;
 	char output, *d0, *d1, *d2;
 	int i;
 	
 	/* tail biting */
 	for (i=0; i<6; i++) {
-		D = D | (in[len-6+i] << i);
+		reg = reg | (in[K-6+i] << i);
 	}
 	
-	/* for convolutional coding, D = K */
+	/* tail biting convolutional coding with rate 1/3: D = K; */
 	d0 = out;
-	d1 = d0 + len;
-	d2 = d1 + len;
-	for (i=0; i<len; i++) {
+	d1 = d0 + K;
+	d2 = d1 + K;
+	for (i=0; i<K; i++) {
 		/* G0 = 1 011 011 */
-		output = *in + (D>>4) + (D>>3) + (D>>1) + D;
+		output = *in + (reg>>4) + (reg>>3) + (reg>>1) + reg;
 		*d0++ = output & 0x1;
 		/* G1 = 1 111 001 */
-		output = *in + (D>>5) + (D>>4) + (D>>3) + D;
+		output = *in + (reg>>5) + (reg>>4) + (reg>>3) + reg;
 		*d1++ = output & 0x1;
 		/* G2 = 1 110 101 */
-		output = *in + (D>>5) + (D>>4) + (D>>2) + D;
+		output = *in + (reg>>5) + (reg>>4) + (reg>>2) + reg;
 		*d2++ = output & 0x1;
 		
-		D = D >> 1;
-		D = D | (*in<<5);
+		reg = reg >> 1;
+		reg = reg | (*in<<5);
 		
 		in++;
 	}
+	
+	return K;
 }

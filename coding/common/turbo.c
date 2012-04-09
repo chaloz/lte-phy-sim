@@ -96,7 +96,7 @@ static void turbo_encode_p(char *in1, char *in2, int len, char *out)
 	*d2++ = out2_t[2];
 }
 
-void turbo_encode(char *in, codeblock_param *param, int cbindex, char *out)
+int turbo_encode(char *in, codeblock_param *param, int cbindex, char *out)
 {
 	int K;
 	
@@ -113,4 +113,7 @@ void turbo_encode(char *in, codeblock_param *param, int cbindex, char *out)
 		memset(out, 0xFF, param->F * sizeof(char));
 		memset(out+K+4, 0xFF, param->F * sizeof(char));
 	}
+	
+	/* turbo coding with rate 1/3: D = K + 4. */
+	return K+4;
 }
