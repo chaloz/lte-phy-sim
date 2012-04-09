@@ -1,4 +1,5 @@
 #include "crc.h"
+#include "errcode.h"
 
 /* ========================================================================= */
 /*              LOCAL FUNCTIONS DECLARATION                                  */
@@ -8,27 +9,33 @@ void calc_crc24b(char *inout, int len);
 void calc_crc16(char *inout, int len);
 void calc_crc8(char *inout, int len);
 
-/**
- * @brief CRC calculation
- *
- * Calculate the CRC according to 5.1.1, 36.212
- * 
- * @param inout - input & output buffer for bit stream
- * @param len   - the length of input bit stream
- * @param type  - the CRC generation polynomial type
- */
-void calc_crc(char *inout, int len, int type)
+
+int calc_crc(char *inout, int len, int type)
 {
-	if (type == CRC_POLY_24A)
+	int output_len;
+	
+	if (type == CRC_POLY_24A) {
 		calc_crc24a(inout, len);
-	else if (type == CRC_POLY_24B)
+		output_len = len + 24;
+	}
+	else if (type == CRC_POLY_24B) {
 		calc_crc24b(inout, len);
-	else if (type == CRC_POLY_16)
+		output_len = len + 24;
+	}
+	else if (type == CRC_POLY_16) {
 		calc_crc16(inout, len);
-	else if (type == CRC_POLY_8)
+		output_len = len + 16;
+	}
+	else if (type == CRC_POLY_8) {
 		calc_crc8(inout, len);
-	else
-		exit(-1);
+		output_len = len + 8;
+	}
+	else {
+		// wrong input
+		exit(CRC_INPUT_LENGTH_ERROR);
+	}
+	
+	return output_len;
 }
 
 /**
