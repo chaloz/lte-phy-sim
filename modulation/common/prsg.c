@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "prsg.h"
 
 #define FREE_RUN_STEPS 1600
